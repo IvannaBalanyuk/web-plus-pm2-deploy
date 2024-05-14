@@ -11,6 +11,14 @@ import {
 import { validateUserBody, validateAuthentication } from '../middlewares/validatons';
 
 const router = Router();
+
+// при GET-запросе на URL /crash-test сервер будет падать, а pm2 должен его восстанавливать
+router.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Сервер сейчас упадёт');
+  }, 0);
+});
+
 router.post('/signup', validateUserBody, createUser);
 router.post('/signin', validateAuthentication, login);
 
@@ -18,7 +26,6 @@ router.post('/signin', validateAuthentication, login);
 router.use(auth);
 router.use('/users', userRouter);
 router.use('/cards', cardRouter);
-
 router.use((req: Request, res: Response, next: NextFunction) => {
   next(new NotFoundError('Маршрут не найден'));
 });
